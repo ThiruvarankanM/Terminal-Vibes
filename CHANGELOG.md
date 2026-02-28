@@ -2,6 +2,17 @@
 
 All notable changes to **TerminalVibes** will be documented here.
 
+## [0.1.1] - 2026-02-28
+
+### Fixed
+- Windows MP3 playback now uses ffplay (if available) with correct duration — no more 5 s cutoff
+- WSL audio fallback via `powershell.exe` when PulseAudio/ALSA/ffplay are unavailable
+- Status bar shows green `All active` / `X/Y active` and red `Disabled` state correctly
+- Linux fallback chain extended with `mpg123`
+
+### Changed
+- Extension icon updated to neon terminal + sound waves design
+
 ## [0.1.0] - 2026-02-28
 
 ### Added

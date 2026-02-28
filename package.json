@@ -2,7 +2,7 @@
   "name": "terminal-vibes",
   "displayName": "TerminalVibes",
   "description": "Play meme & fun sounds based on terminal output — errors, test results, builds, deploys, and more.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "DevVibes",
   "license": "MIT",
   "icon": "assets/icon.png",
