@@ -5,6 +5,10 @@
 TerminalVibes watches your terminal output in real time and plays meme sounds the moment something interesting happens — errors, test failures, successful builds, deploys, and more. Includes the iconic **faah** sound, vine boom, emotional damage, and 40+ other meme sound effects.
 
 ---
+🎬 **TerminalVibes Demo – Your Terminal, Now With Meme Sounds 🔊**
+
+https://github.com/user-attachments/assets/90961588-253b-453b-8e01-1f2df65d463e
+
 
 ## Features
 
