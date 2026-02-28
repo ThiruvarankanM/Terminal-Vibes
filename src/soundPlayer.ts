@@ -85,7 +85,6 @@ export class SoundPlayer {
   }
 
   private spawnPlayer(filePath: string, volume: number): void {
-    // Kill previous if still running
     this.activeProcess?.kill();
 
     const platform = os.platform();
@@ -93,37 +92,72 @@ export class SoundPlayer {
     let args: string[];
 
     if (platform === 'darwin') {
+      // afplay is built-in on macOS and supports volume
       const vol = Math.min(1, Math.max(0.1, volume));
-      cmd = 'afplay';
+      cmd  = 'afplay';
       args = [filePath, '-v', String(vol)];
+
     } else if (platform === 'win32') {
-      const ext = path.extname(filePath).toLowerCase();
+      const safe = filePath.replace(/'/g, "''");
+      const ext  = path.extname(filePath).toLowerCase();
+
       if (ext === '.wav') {
-        cmd = 'powershell';
+        // SoundPlayer is built-in and handles WAV reliably
+        cmd  = 'powershell';
         args = [
-          '-NoProfile', '-NonInteractive', '-Command',
-          `(New-Object Media.SoundPlayer '${filePath.replace(/'/g, "''")}').PlaySync()`,
+          '-NoProfile', '-NonInteractive', '-WindowStyle', 'Hidden', '-Command',
+          `(New-Object Media.SoundPlayer '${safe}').PlaySync()`,
         ];
       } else {
-        cmd = 'powershell';
+        // Try ffplay first (handles duration automatically, no truncation),
+        // fall back to WMPlayer with a 10 s window (covers all bundled meme sounds)
+        cmd  = 'powershell';
         args = [
-          '-NoProfile', '-NonInteractive', '-Command',
-          `$wmp = New-Object -ComObject WMPlayer.OCX; $wmp.URL = '${filePath.replace(/'/g, "''")}'; $wmp.controls.play(); Start-Sleep 5; $wmp.close()`,
+          '-NoProfile', '-NonInteractive', '-WindowStyle', 'Hidden', '-Command',
+          `$f=Get-Command ffplay -EA SilentlyContinue;` +
+          `if($f){& ffplay -nodisp -autoexit -loglevel quiet '${safe}'}` +
+          `else{$w=New-Object -ComObject WMPlayer.OCX;$w.URL='${safe}';$w.controls.play();Start-Sleep 10;$w.close()}`,
         ];
       }
+
     } else {
-      // Linux — try multiple backends
-      cmd = 'sh';
-      const escaped = filePath.replace(/'/g, "'\\''");
-      args = [
-        '-c',
-        `paplay '${escaped}' 2>/dev/null || aplay '${escaped}' 2>/dev/null || ffplay -nodisp -autoexit '${escaped}' 2>/dev/null`,
-      ];
+      // Linux & WSL
+      const esc    = filePath.replace(/'/g, "'\\''");
+      const isWsl  = this.detectWsl();
+
+      // Native Linux audio: PulseAudio → ALSA → mpg123 → ffplay
+      const nativeChain =
+        `paplay '${esc}' 2>/dev/null` +
+        ` || aplay '${esc}' 2>/dev/null` +
+        ` || mpg123 -q '${esc}' 2>/dev/null` +
+        ` || ffplay -nodisp -autoexit -loglevel quiet '${esc}' 2>/dev/null`;
+
+      // WSL fallback: convert path with wslpath, pipe a PS script to powershell.exe via stdin.
+      // Single-quoting the printf format keeps PowerShell's $w unexpanded by bash;
+      // %s is replaced at runtime with the converted Windows path.
+      const wslChain = isWsl
+        ? ` || { _wp=$(wslpath -w '${esc}' 2>/dev/null) && [ -n "$_wp" ] &&` +
+          ` printf '$w=New-Object -ComObject WMPlayer.OCX;$w.URL="%s";$w.controls.play();Start-Sleep 10;$w.close()' "$_wp"` +
+          ` | powershell.exe -NoProfile -NonInteractive -Command - 2>/dev/null; }`
+        : '';
+
+      cmd  = 'sh';
+      args = ['-c', nativeChain + wslChain];
     }
 
     this.activeProcess = cp.spawn(cmd, args, { stdio: 'ignore', detached: false });
-    this.activeProcess.on('error', () => { /* silently ignore */ });
+    this.activeProcess.on('error', () => {});
     this.activeProcess.unref();
+  }
+
+  /** Returns true when running inside WSL (any version). */
+  private detectWsl(): boolean {
+    try {
+      const v = fs.readFileSync('/proc/version', 'utf8').toLowerCase();
+      return v.includes('microsoft') || v.includes('wsl');
+    } catch {
+      return false;
+    }
   }
 
   dispose(): void {
