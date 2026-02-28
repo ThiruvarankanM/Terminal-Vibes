@@ -1,0 +1,114 @@
+{
+  "name": "terminal-vibes",
+  "displayName": "TerminalVibes",
+  "description": "Play meme & fun sounds based on terminal output — errors, test results, builds, deploys, and more.",
+  "version": "0.1.0",
+  "publisher": "DevVibes",
+  "license": "MIT",
+  "icon": "assets/icon.png",
+  "galleryBanner": {
+    "color": "#0d1117",
+    "theme": "dark"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ThiruvarankanM/Code-with-Meme"
+  },
+  "engines": {
+    "vscode": "^1.93.0"
+  },
+  "categories": [
+    "Other",
+    "Visualization"
+  ],
+  "keywords": [
+    "sound",
+    "audio",
+    "terminal",
+    "meme",
+    "notification",
+    "error",
+    "fun",
+    "vibes",
+    "music",
+    "alert"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "soundOnError.toggle",
+        "title": "TerminalVibes: Toggle On/Off"
+      },
+      {
+        "command": "soundOnError.selectSound",
+        "title": "TerminalVibes: Sound Categories"
+      },
+      {
+        "command": "soundOnError.setCustomSound",
+        "title": "TerminalVibes: Set Custom Sound File"
+      },
+      {
+        "command": "soundOnError.testSound",
+        "title": "TerminalVibes: Test Current Sound"
+      },
+      {
+        "command": "soundOnError.resetKeywords",
+        "title": "TerminalVibes: Reset All Category Keywords to Default"
+      }
+    ],
+    "configuration": {
+      "title": "TerminalVibes",
+      "properties": {
+        "soundOnError.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Master toggle — enable or disable all sound notifications"
+        },
+        "soundOnError.cooldown": {
+          "type": "number",
+          "default": 3000,
+          "minimum": 500,
+          "maximum": 60000,
+          "description": "Minimum milliseconds between any two sound plays (prevents spam)"
+        },
+        "soundOnError.volume": {
+          "type": "number",
+          "default": 1,
+          "minimum": 0.1,
+          "maximum": 1,
+          "description": "Playback volume (0.1 – 1.0). Effective on macOS."
+        },
+        "soundOnError.categories": {
+          "type": "object",
+          "default": {},
+          "markdownDescription": "Per-category sound configuration. Each key is a category ID (`error`, `testPass`, `testFail`, `buildOk`, `buildFail`, `deploy`, `warning`, `ready`). Use the **TerminalVibes: Sound Categories** picker (click the status bar) to configure them visually.",
+          "description": "Per-category overrides for enabled, sound, customSoundPath, and keywords. Managed via the status bar picker."
+        },
+        "soundOnError.userCategories": {
+          "type": "array",
+          "default": [],
+          "description": "User-created custom categories. Managed via the status bar → Create new category flow."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "build": "node esbuild.config.js --production",
+    "watch": "node esbuild.config.js",
+    "compile": "tsc --noEmit",
+    "generate-sounds": "node scripts/generate-sounds.js",
+    "package": "npm run generate-sounds && vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.35",
+    "@types/vscode": "^1.93.0",
+    "@vscode/vsce": "^2.32.0",
+    "esbuild": "^0.20.2",
+    "typescript": "^5.9.3"
+  }
+}

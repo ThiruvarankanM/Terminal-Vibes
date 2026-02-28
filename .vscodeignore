@@ -1,0 +1,46 @@
+# Source files — bundled by esbuild, not needed in the package
+src/
+**/*.ts
+!**/*.d.ts
+
+# Build tooling
+esbuild.config.js
+tsconfig.json
+scripts/
+
+# Development/test files
+examples/
+
+# Git
+.git/
+.github/
+.gitignore
+.gitattributes
+
+# Dependency source — bundled by esbuild
+node_modules/
+
+# Lockfile — not needed at runtime
+package-lock.json
+yarn.lock
+
+# Source maps — not shipped in production
+**/*.js.map
+
+# macOS metadata
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+
+# VSCode test runner
+.vscode-test/
+
+# Packaged artifacts (don't nest .vsix inside .vsix)
+*.vsix
+
+# CI/CD
+.travis.yml
+.circleci/
+.github/
