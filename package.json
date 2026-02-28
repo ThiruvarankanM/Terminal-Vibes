@@ -1,7 +1,7 @@
 {
   "name": "terminal-vibes",
   "displayName": "TerminalVibes",
-  "description": "Play meme & fun sounds based on terminal output — errors, test results, builds, deploys, and more.",
+  "description": "Plays faah, vine boom, emotional damage & 40+ meme sounds on terminal errors, test results, builds and deploys.",
   "version": "0.1.1",
   "publisher": "DevVibes",
   "license": "MIT",
@@ -31,7 +31,8 @@
     "fun",
     "vibes",
     "music",
-    "alert"
+    "alert",
+    "faah"
   ],
   "activationEvents": [
     "onStartupFinished"
