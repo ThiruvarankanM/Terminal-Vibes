@@ -101,8 +101,7 @@
     "build": "node esbuild.config.js --production",
     "watch": "node esbuild.config.js",
     "compile": "tsc --noEmit",
-    "generate-sounds": "node scripts/generate-sounds.js",
-    "package": "npm run generate-sounds && vsce package"
+    "package": "vsce package"
   },
   "devDependencies": {
     "@types/node": "^20.19.35",
